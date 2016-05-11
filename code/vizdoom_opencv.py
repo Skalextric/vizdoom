@@ -20,6 +20,11 @@ import cv2
 import mahotas
 import numpy as np
 import aux.utilities as utilities
+import aux.aux_game_state as aux_state
+
+#Learn
+from reinforcement_learning.q_learn import q_agent, feature_extractors
+
 
 game = DoomGame()
 
@@ -35,12 +40,18 @@ game.init()
 left = [1, 0, 0]
 right = [0, 1, 0]
 attack = [0, 0, 1]
-actions = [left, right, attack]
+actions ={'left':left, 'right': right, 'attack': attack}
+
 
 episodes = 10
 # sleep time in ms
 sleep_time = 20
-distance = 0
+
+# Own doom_agent and gamestate
+doom_agent = q_agent.QLearningAgent(feature_extractors.SimpleExtractor())
+auxstate = aux_state.AuxGameState(actions)
+
+
 for i in range(episodes):
     print("Episode #" + str(i + 1))
     # Not needed for the first episdoe but the loop is nicer.
@@ -51,6 +62,7 @@ for i in range(episodes):
         s = game.get_state()
         img = s.image_buffer
         misc = s.game_variables
+
 
         # Gray8 shape is not cv2 compliant
         if game.get_screen_format() in [ScreenFormat.GRAY8, ScreenFormat.DEPTH_BUFFER8]:
@@ -78,7 +90,7 @@ for i in range(episodes):
 
         # distance = utilities.euclidean_distance(rectangle_center, mid)
         x_distance = abs(rectangle_center[0] - mid[0])
-
+        auxstate.set_x_distance(x_distance)
 
         ###Displaying images###
         # cv2.imshow('Blue', blue)
@@ -88,7 +100,8 @@ for i in range(episodes):
         '''END OPENCV'''
 
         # Makes a random action and save the reward.
-        r = game.make_action(choice(actions))
+        random_action = choice(actions.keys())
+        r = game.make_action(actions[random_action])
 
         print("State #" + str(s.number))
         print("Game Variables:", misc)
