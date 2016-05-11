@@ -22,9 +22,8 @@ import numpy as np
 import aux.utilities as utilities
 import aux.aux_game_state as aux_state
 
-#Learn
+# Learn
 from reinforcement_learning.q_learn import q_agent, feature_extractors
-
 
 game = DoomGame()
 
@@ -33,15 +32,14 @@ game.load_config("../configs/vizdoom_opencv.cfg")
 
 game.set_screen_format(ScreenFormat.RGB24)
 
-# game.set_mode(Mode.SPECTATOR)
+#game.set_mode(Mode.SPECTATOR)
 
 game.init()
 
 left = [1, 0, 0]
 right = [0, 1, 0]
 attack = [0, 0, 1]
-actions ={'left':left, 'right': right, 'attack': attack}
-
+actions = {'left': left, 'right': right, 'attack': attack}
 
 episodes = 10
 # sleep time in ms
@@ -50,7 +48,6 @@ sleep_time = 20
 # Own doom_agent and gamestate
 doom_agent = q_agent.QLearningAgent(feature_extractors.SimpleExtractor())
 auxstate = aux_state.AuxGameState(actions)
-
 
 for i in range(episodes):
     print("Episode #" + str(i + 1))
@@ -62,7 +59,6 @@ for i in range(episodes):
         s = game.get_state()
         img = s.image_buffer
         misc = s.game_variables
-
 
         # Gray8 shape is not cv2 compliant
         if game.get_screen_format() in [ScreenFormat.GRAY8, ScreenFormat.DEPTH_BUFFER8]:
@@ -81,35 +77,37 @@ for i in range(episodes):
         (x, y, w, h) = cv2.boundingRect(points)
         cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-
         rectangle_center = (w / 2 + x, h / 2 + y)
         cv2.circle(img, rectangle_center, 3, (0, 2550, 0))
 
         mid = (img.shape[1] // 2, img.shape[0] // 2)
-        #cv2.circle(img, mid, 5, (255, 0, 0), -1)
-
-        # distance = utilities.euclidean_distance(rectangle_center, mid)
-        x_distance = abs(rectangle_center[0] - mid[0])
+        x_distance = rectangle_center[0] - mid[0]
+        #if x_distance < 0 the enemy is left, else right
         auxstate.set_x_distance(x_distance)
 
+
         ###Displaying images###
-        # cv2.imshow('Blue', blue)
+        #cv2.imshow('Blue', blue)
         cv2.imshow('Doom Buffer', img)
         cv2.waitKey(sleep_time)
 
         '''END OPENCV'''
 
-        # Makes a random action and save the reward.
-        random_action = choice(actions.keys())
-        r = game.make_action(actions[random_action])
+        #Get random action
+        action = choice(actions.keys())
+        ###Cheating code, not learning!!!###
+        action = utilities.cheat_basic(x_distance, w)
+        # Makes an action and save the reward.
+        r = game.make_action(actions[action])
 
+        '''
         print("State #" + str(s.number))
         print("Game Variables:", misc)
         print("Last Reward:", r)
         print("=====================")
-
+        '''
+        sleep(.05)
     print("Episode finished!")
     print("total reward:", game.get_total_reward())
     print("************************")
-
 cv2.destroyAllWindows()

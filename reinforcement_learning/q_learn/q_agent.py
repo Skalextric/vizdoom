@@ -4,27 +4,8 @@ class QLearningAgent:
         self.extractor = extractor
         self.qvalues = {}
 
-        #Learning rate
+        # Learning rate
         self.alpha = 0.5
-
-
-    def getQValue(self, state, action):
-        qvalue = 0.0
-        if (state, action) in self.qvalues:
-            qvalue = self.qvalues[(state, action)]
-
-        return qvalue
-
-    def computeValueFromQValues(self, state):
-        value_list = []
-        for action in self.getLegalActions(state):
-            value_list.append(self.getQValue(state, action))
-        if len(value_list) == 0:
-            value = 0.0
-        else:
-            value = max(value_list)
-        return value
-
 
     def getQValue(self, state, action):
         features = self.extractor.getFeatures(state, action)
@@ -38,6 +19,25 @@ class QLearningAgent:
                 q_value += self.weights[key] * feature_value
         return q_value
 
+    def computeValueFromQValues(self, state):
+        value_list = []
+        for action in self.getLegalActions(state):
+            value_list.append(self.getQValue(state, action))
+        if len(value_list) == 0:
+            value = 0.0
+        else:
+            value = max(value_list)
+        return value
+
+    def computeActionFromQValues(self, state):
+        max_value = -float('inf')
+        best_action = None
+        for action in self.getLegalActions(state):
+            actual_value = self.getQValue(state, action)
+            if actual_value > max_value:
+                max_value = actual_value
+                best_action = action
+        return best_action
 
     def update(self, state, action, nextState, reward):
         diff = (reward + self.discount * self.computeValueFromQValues(nextState) - self.getQValue(state, action))
