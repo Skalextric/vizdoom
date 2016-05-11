@@ -106,7 +106,7 @@ for i in range(episodes):
         print("Last Reward:", r)
         print("=====================")
         '''
-        sleep(.05)
+        sleep(.02)
     print("Episode finished!")
     print("total reward:", game.get_total_reward())
     print("************************")
