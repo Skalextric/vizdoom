@@ -53,17 +53,12 @@ for i in range(episodes):
         s = game.get_state()
         misc = s.game_variables
 
-        '''OPENCV '''
         img, features = doom_agent.extractor.getFeatures(s, ret_img=True)
-        ###Displaying images###
         cv2.imshow('Doom Buffer', img)
         cv2.waitKey(sleep_time)
 
-        '''END OPENCV'''
-
         # Get random action
-        action = choice(actions.keys())
-
+        #action = choice(actions.keys())
         ###Cheating code, not learning!!!###
         x_distance = features['x_distance']
         w = features['target_size'][0]
