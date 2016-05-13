@@ -1,12 +1,22 @@
+from random import uniform, choice
+
+
 class QLearningAgent:
-    def __init__(self, extractor):
+    def __init__(self, extractor, actions, learning=True):
         self.weights = {}
         self.extractor = extractor
         self.qvalues = {}
+        self.learning = learning
+        self.actions = actions
 
         # Learning rate
-        self.alpha = 0.5
-        self.discount = 1
+        self.alpha = 0.2
+
+        # Reward Discount
+        self.discount = 0.8
+
+        # Probability of random action
+        self.epsilon = 0.05
 
     def getQValue(self, state, action):
         features = self.extractor.getFeatures(state, action)
@@ -21,8 +31,9 @@ class QLearningAgent:
         return q_value
 
     def computeValueFromQValues(self, state):
+
         value_list = []
-        for action in self.getLegalActions(state):
+        for action in self.getLegalActions():
             value_list.append(self.getQValue(state, action))
         if len(value_list) == 0:
             value = 0.0
@@ -33,18 +44,32 @@ class QLearningAgent:
     def computeActionFromQValues(self, state):
         max_value = -float('inf')
         best_action = None
-        for action in self.getLegalActions(state):
+        for action in self.getLegalActions():
             actual_value = self.getQValue(state, action)
             if actual_value > max_value:
                 max_value = actual_value
                 best_action = action
         return best_action
 
-    def update(self, state, action, nextState, reward):
-        diff = (reward + self.discount * self.computeValueFromQValues(nextState) - self.getQValue(state, action))
+    def getAction(self, state):
+        random = uniform(0, 1)
+        if random <= self.epsilon:
+            action = choice(self.getLegalActions())
+        else:
+            action = self.computeActionFromQValues(state)
+        return action
+
+    def update(self, state, action, reward, nextState=None):
+
+        if nextState == None:
+            nextStateValue = 0
+        else:
+            nextStateValue = self.computeValueFromQValues(nextState)
+        qvalue = self.getQValue(state, action)
+        diff = (reward + self.discount * nextStateValue - qvalue)
         features = self.extractor.getFeatures(state, action=action)
         for key in self.weights:
             self.weights[key] = self.weights[key] + self.alpha * diff * features[key]
 
-    def getLegalActions(self, state):
-        return state.legalActions
+    def getLegalActions(self):
+        return self.actions

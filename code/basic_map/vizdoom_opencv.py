@@ -11,7 +11,7 @@
 # To see the scenario description go to "../../scenarios/README.md"
 # 
 #####################################################################
-from __future__ import print_function
+# from __future__ import print_function
 from code.vizdoom import *
 from time import sleep
 from random import choice
@@ -37,39 +37,43 @@ right = [0, 1, 0]
 attack = [0, 0, 1]
 actions = {'left': left, 'right': right, 'attack': attack}
 
-episodes = 10
+episodes = 300
 # sleep time in ms
 sleep_time = 1
 
 # Own doom_agent and gamestate
-doom_agent = q_agent.QLearningAgent(feature_extractors.BasicMapExtractor())
+doom_agent = q_agent.QLearningAgent(feature_extractors.BasicMapExtractor(), actions.keys())
 
 for i in range(episodes):
-    print("Episode #" + str(i + 1))
-    # Not needed for the first episdoe but the loop is nicer.
+    # print("Episode #" + str(i + 1))
+    # Not needed for the first episode but the loop is nicer.
     game.new_episode()
     while not game.is_episode_finished():
         # Gets the state and possibly to something with it
-        s = game.get_state()
-        misc = s.game_variables
+        game_state = game.get_state()
+        misc = game_state.game_variables
 
-        imgs, features = doom_agent.extractor.getFeatures(s, ret_img=True)
-        cv2.imshow('Doom Buffer 0', imgs[0])
-        cv2.imshow('Doom Buffer', imgs[1])
-        cv2.waitKey(sleep_time)
-
-
+        imgs, features = doom_agent.extractor.getFeatures(game_state, ret_img=True)
+        # cv2.imshow('Doom Buffer 0', imgs[0])
+        # cv2.waitKey(sleep_time)
 
         # Get random action
         # action = choice(actions.keys())
         ###Cheating code, not learning!!!###
-        x_distance = features['x_distance']
-        w = features['target_size'][0]
-        action = utilities.cheat_basic(x_distance, w)
+        ##x_distance = features['x_distance']
+        ##w = features['target_size'][0]
+        ##action = utilities.cheat_basic(x_distance, w)
 
 
         # Makes an action and save the reward.
+        action = doom_agent.getAction(game_state)
         r = game.make_action(actions[action])
+        nextGameState = game.get_state()
+        if not game.is_episode_finished():
+            doom_agent.update(game_state, action, r, nextState=nextGameState)
+        else:
+            doom_agent.update(game_state, action, r, nextState=None)
+        print doom_agent.weights
 
         '''
         print("State #" + str(s.number))
@@ -77,7 +81,7 @@ for i in range(episodes):
         print("Last Reward:", r)
         print("=====================")
         '''
-        sleep(0.02)
+        # sleep(0.02)
     print("Episode finished!")
     print("total reward:", game.get_total_reward())
     print("************************")

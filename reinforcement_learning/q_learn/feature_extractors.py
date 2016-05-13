@@ -29,11 +29,23 @@ class BasicMapExtractor(FeatureExtractor):
         rectangle_center = (w / 2 + x, h / 2 + y)
 
         mid = (img.shape[1] // 2, img.shape[0] // 2)
-        x_distance = rectangle_center[0] - mid[0]
+        distance = rectangle_center[0] - mid[0]
+        features['closer_right'] = 0.0
+        features['closer_left'] = 0.0
 
-        features['x_distance'] = x_distance
-        features['target_size'] = (w, h)
-        features['target_position'] = (x, y)
+        if distance < 0 and action == 'right':
+            features['closer_left'] = 1.0
+        elif distance > 0 and action == 'left':
+            features['closer_right'] = 1.0
+
+
+        if abs(distance) < w and action == 'attack':
+            features['in_target'] = 1.0
+        else:
+            features['in_target'] = 0.0
+
+        # features['target_size'] = (w, h)
+        # features['target_position'] = (x, y)
 
         if ret_img:
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
