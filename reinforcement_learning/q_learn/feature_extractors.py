@@ -38,6 +38,6 @@ class BasicMapExtractor(FeatureExtractor):
         if ret_img:
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
             cv2.circle(img, rectangle_center, 3, (0, 2550, 0))
-            return img, features
+            return [img, blue], features
         else:
             return features

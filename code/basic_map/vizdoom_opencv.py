@@ -39,7 +39,7 @@ actions = {'left': left, 'right': right, 'attack': attack}
 
 episodes = 10
 # sleep time in ms
-sleep_time = 20
+sleep_time = 1
 
 # Own doom_agent and gamestate
 doom_agent = q_agent.QLearningAgent(feature_extractors.BasicMapExtractor())
@@ -53,16 +53,20 @@ for i in range(episodes):
         s = game.get_state()
         misc = s.game_variables
 
-        img, features = doom_agent.extractor.getFeatures(s, ret_img=True)
-        cv2.imshow('Doom Buffer', img)
+        imgs, features = doom_agent.extractor.getFeatures(s, ret_img=True)
+        cv2.imshow('Doom Buffer 0', imgs[0])
+        cv2.imshow('Doom Buffer', imgs[1])
         cv2.waitKey(sleep_time)
 
+
+
         # Get random action
-        #action = choice(actions.keys())
+        # action = choice(actions.keys())
         ###Cheating code, not learning!!!###
         x_distance = features['x_distance']
         w = features['target_size'][0]
         action = utilities.cheat_basic(x_distance, w)
+
 
         # Makes an action and save the reward.
         r = game.make_action(actions[action])
@@ -73,7 +77,7 @@ for i in range(episodes):
         print("Last Reward:", r)
         print("=====================")
         '''
-        sleep(.02)
+        sleep(0.02)
     print("Episode finished!")
     print("total reward:", game.get_total_reward())
     print("************************")

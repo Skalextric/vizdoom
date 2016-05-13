@@ -6,6 +6,7 @@ class QLearningAgent:
 
         # Learning rate
         self.alpha = 0.5
+        self.discount = 1
 
     def getQValue(self, state, action):
         features = self.extractor.getFeatures(state, action)
@@ -41,7 +42,7 @@ class QLearningAgent:
 
     def update(self, state, action, nextState, reward):
         diff = (reward + self.discount * self.computeValueFromQValues(nextState) - self.getQValue(state, action))
-        features = self.extractor.getFeatures(state, action)
+        features = self.extractor.getFeatures(state, action=action)
         for key in self.weights:
             self.weights[key] = self.weights[key] + self.alpha * diff * features[key]
 
