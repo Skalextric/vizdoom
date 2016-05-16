@@ -24,7 +24,7 @@ from reinforcement_learning.q_learn import q_agent, feature_extractors
 game = DoomGame()
 
 # Use other config file if you wish.
-game.load_config("../configs/vizdoom_opencv.cfg")
+game.load_config("../../configs/vizdoom_opencv.cfg")
 
 game.set_screen_format(ScreenFormat.RGB24)
 
