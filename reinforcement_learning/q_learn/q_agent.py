@@ -10,13 +10,12 @@ class QLearningAgent:
         self.actions = actions
 
         # Learning rate
-        self.alpha = 0.2
-
+        self.alpha = 0.3
         # Reward Discount
         self.discount = 0.8
 
         # Probability of random action
-        self.epsilon = 0.05
+        self.epsilon = 0.1
 
     def getQValue(self, state, action):
         features = self.extractor.getFeatures(state, action)
@@ -31,7 +30,6 @@ class QLearningAgent:
         return q_value
 
     def computeValueFromQValues(self, state):
-
         value_list = []
         for action in self.getLegalActions():
             value_list.append(self.getQValue(state, action))
@@ -49,6 +47,7 @@ class QLearningAgent:
             if actual_value > max_value:
                 max_value = actual_value
                 best_action = action
+
         return best_action
 
     def getAction(self, state):
@@ -65,11 +64,14 @@ class QLearningAgent:
             nextStateValue = 0
         else:
             nextStateValue = self.computeValueFromQValues(nextState)
+
         qvalue = self.getQValue(state, action)
-        diff = (reward + self.discount * nextStateValue - qvalue)
+        diff = (reward + self.discount * nextStateValue) - (qvalue)
+
         features = self.extractor.getFeatures(state, action=action)
         for key in self.weights:
-            self.weights[key] = self.weights[key] + self.alpha * diff * features[key]
+            new_weight = self.weights[key] + self.alpha * diff * features[key]
+            self.weights[key] = new_weight
 
     def getLegalActions(self):
         return self.actions

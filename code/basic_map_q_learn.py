@@ -36,19 +36,28 @@ left = [1, 0, 0]
 right = [0, 1, 0]
 attack = [0, 0, 1]
 actions = {'left': left, 'right': right, 'attack': attack}
+#actions = {'left': left, 'right': right}
 
 episodes = 300
 # sleep time in ms
 sleep_time = 1
-
+learning =  True
 # Own doom_agent and gamestate
 doom_agent = q_agent.QLearningAgent(feature_extractors.BasicMapExtractor(), actions.keys())
 
 for i in range(episodes):
     # print("Episode #" + str(i + 1))
     # Not needed for the first episode but the loop is nicer.
+
+    if i > 20:
+        learning = False
+        print 'Learning finised'
+    else:
+        print 'Currently learning'
+
     game.new_episode()
     while not game.is_episode_finished():
+
         # Gets the state and possibly to something with it
         game_state = game.get_state()
         misc = game_state.game_variables
@@ -69,11 +78,13 @@ for i in range(episodes):
         action = doom_agent.getAction(game_state)
         r = game.make_action(actions[action])
         nextGameState = game.get_state()
-        if not game.is_episode_finished():
-            doom_agent.update(game_state, action, r, nextState=nextGameState)
-        else:
-            doom_agent.update(game_state, action, r, nextState=None)
-        print doom_agent.weights
+
+        if learning:
+            if not game.is_episode_finished():
+                doom_agent.update(game_state, action, r, nextState=nextGameState)
+            else:
+                doom_agent.update(game_state, action, r)
+        #print doom_agent.weights
 
         '''
         print("State #" + str(s.number))
@@ -82,6 +93,7 @@ for i in range(episodes):
         print("=====================")
         '''
         # sleep(0.02)
+        #raw_input()
     print("Episode finished!")
     print("total reward:", game.get_total_reward())
     print("************************")
