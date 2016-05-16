@@ -10,10 +10,9 @@ class QLearningAgent:
         self.actions = actions
 
         # Learning rate
-        self.alpha = 0.3
+        self.alpha = 0.2
         # Reward Discount
         self.discount = 0.8
-
         # Probability of random action
         self.epsilon = 0.1
 

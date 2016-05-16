@@ -38,7 +38,7 @@ attack = [0, 0, 1]
 actions = {'left': left, 'right': right, 'attack': attack}
 #actions = {'left': left, 'right': right}
 
-episodes = 300
+episodes = 30
 # sleep time in ms
 sleep_time = 1
 learning =  True
@@ -92,7 +92,7 @@ for i in range(episodes):
         print("Last Reward:", r)
         print("=====================")
         '''
-        # sleep(0.02)
+        sleep(0.02)
         #raw_input()
     print("Episode finished!")
     print("total reward:", game.get_total_reward())
