@@ -4,12 +4,12 @@
 # OpenCV is used here to display images, install it or remove any
 # references to cv2
 # Configuration is loaded from "../../examples/config/basic.cfg" file.
-# <episodes> number of episodes are played. 
+# <episodes> number of episodes are played.
 # Random combination of buttons is chosen for every action.
 # Game variables from state and last reward are printed.
 
 # To see the scenario description go to "../../scenarios/README.md"
-# 
+#
 #####################################################################
 # from __future__ import print_function
 from code.vizdoom import *
@@ -24,7 +24,7 @@ from reinforcement_learning.q_learn import q_agent, feature_extractors
 game = DoomGame()
 
 # Use other config file if you wish.
-game.load_config("../../configs/vizdoom_opencv.cfg")
+game.load_config("../configs/vizdoom_opencv.cfg")
 
 game.set_screen_format(ScreenFormat.RGB24)
 
